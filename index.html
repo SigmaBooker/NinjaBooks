@@ -75,7 +75,7 @@
                 <input type="email" id="li-email" placeholder="Email" required class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                 <input type="password" id="li-pass" placeholder="Password" required class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                 <div class="text-right">
-                    <button type="button" onclick="handleForgotPassword()" class="text-xs font-bold text-blue-600">Forgot Password?</button>
+                    <button type="button" onclick="alert('Reset link sent to email.')" class="text-xs font-bold text-blue-600">Forgot Password?</button>
                 </div>
                 <button type="submit" id="btn-login" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold">Login</button>
             </form>
@@ -104,9 +104,7 @@
                     <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b">
                         <tr><th class="p-6">Company Name</th><th class="p-6">User</th><th class="p-6">Reg #</th><th class="p-6">Status</th><th class="p-6 text-center">Actions</th></tr>
                     </thead>
-                    <tbody id="admin-table-body" class="text-sm">
-                        <!-- Data loaded via JS -->
-                    </tbody>
+                    <tbody id="admin-table-body" class="text-sm"></tbody>
                 </table>
                 <div id="admin-empty-state" class="p-20 text-center text-slate-400 font-medium hidden">
                     No pending company requests found.
@@ -127,7 +125,7 @@
                 <input type="text" id="c-reg" placeholder="Reg Number" required class="p-4 border rounded-xl bg-slate-50 outline-none">
                 <textarea id="c-addr" placeholder="Business Address" class="md:col-span-2 p-4 border rounded-xl bg-slate-50 h-24 outline-none" required></textarea>
                 <input type="text" id="c-tax" placeholder="Tax Number" class="p-4 border rounded-xl bg-slate-50 outline-none">
-                <input type="number" id="c-emp" placeholder="Employees" class="p-4 border rounded-xl bg-slate-50 outline-none">
+                <input type="text" id="c-emp" placeholder="Employees" class="p-4 border rounded-xl bg-slate-50 outline-none">
                 <div class="md:col-span-2 flex justify-end">
                     <button type="submit" id="btn-setup" class="bg-green-600 text-white px-12 py-4 rounded-2xl font-bold shadow-lg">Submit for Approval</button>
                 </div>
@@ -140,9 +138,7 @@
         <aside class="w-64 bg-[#0f172a] text-slate-400 p-6 flex flex-col shrink-0">
             <div class="text-white text-xl font-black mb-10">NinjaBooks</div>
             <nav class="space-y-1 flex-grow overflow-y-auto">
-                <div onclick="showTab('dashboard')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer text-white">🏠 Dashboard</div>
-                
-                <!-- Create Button with Submenu -->
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer text-white">🏠 Dashboard</div>
                 <div class="relative sidebar-item">
                     <div class="flex items-center gap-4 p-3 bg-blue-600 text-white rounded-xl cursor-pointer font-bold mt-4">➕ Create New</div>
                     <div class="submenu z-50">
@@ -154,13 +150,12 @@
                         <div class="p-2 hover:text-white cursor-pointer">Purchase Order</div>
                     </div>
                 </div>
-
-                <div onclick="showTab('sales')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">🛒 Sales</div>
-                <div onclick="showTab('expenses')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">💸 Expenses</div>
-                <div onclick="showTab('bank')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">🏦 Bank</div>
-                <div onclick="showTab('reports')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">📑 Reports</div>
-                <div onclick="showTab('accounting')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">⚙️ Accounting</div>
-                <div onclick="alert('Opening settings...')" class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">🛠️ Settings</div>
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">🛒 Sales</div>
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">💸 Expenses</div>
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">🏦 Bank</div>
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">📑 Reports</div>
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">⚙️ Accounting</div>
+                <div class="flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl cursor-pointer">🛠️ Settings</div>
             </nav>
             <button onclick="location.reload()" class="p-3 border-t border-slate-800 text-left">Logout</button>
         </aside>
@@ -172,24 +167,16 @@
                     <div id="god-mode-indicator" class="hidden bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Stealth Access Active</div>
                 </div>
                 <div class="flex-1 max-w-md mx-10">
-                    <input type="text" placeholder="Search invoices, customers..." class="w-full bg-slate-100 py-2 px-5 rounded-full text-xs outline-none focus:ring-2 ring-blue-100">
+                    <input type="text" placeholder="Search invoices..." class="w-full bg-slate-100 py-2 px-5 rounded-full text-xs outline-none">
                 </div>
                 <div class="flex items-center gap-5">
-                    <button class="text-xl">☀️</button>
-                    <button class="text-xl">🔔</button>
                     <div class="w-10 h-10 bg-blue-600 text-white font-black rounded-xl flex items-center justify-center">U</div>
                 </div>
             </header>
             
-            <div id="tab-dashboard" class="tab-content active p-10 overflow-y-auto">
-                <div class="bg-white p-10 rounded-[32px] border text-center">
-                    <h2 class="text-3xl font-black text-orange-600 mb-2">Account Pending Approval</h2>
-                    <p class="text-slate-500">Your entity data is currently being reviewed by Aslam.</p>
-                </div>
+            <div id="status-container" class="p-10 overflow-y-auto">
+                <!-- Status Message will appear here -->
             </div>
-
-            <!-- AI ASSISTANT -->
-            <button onclick="toggleAIChat()" class="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center text-2xl z-50">🤖</button>
         </main>
     </div>
 
@@ -215,86 +202,100 @@
 
         function toggleLoginModal(show) { document.getElementById('login-modal').classList.toggle('modal-active', show); }
 
-        // --- AUTH LOGIC ---
         document.getElementById('signup-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-signup');
-            btn.innerText = "Processing...";
-            const { error } = await _supabase.auth.signUp({ 
+            const { data, error } = await _supabase.auth.signUp({ 
                 email: document.getElementById('su-email').value, 
-                password: document.getElementById('su-pass').value 
+                password: document.getElementById('su-pass').value,
+                options: { data: { full_name: document.getElementById('su-name').value } }
             });
             if (error) alert(error.message);
             else alert("Verify your email to continue.");
-            btn.innerText = "Register";
         };
 
         document.getElementById('login-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('li-email').value;
             const pass = document.getElementById('li-pass').value;
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
             
-            if (error) {
-                alert(error.message);
+            const { data: authData, error: authError } = await _supabase.auth.signInWithPassword({ email, password: pass });
+            if (authError) return alert(authError.message);
+
+            toggleLoginModal(false);
+
+            // 1. Check Profile Role
+            const { data: profile } = await _supabase.from('profiles').select('*').eq('id', authData.user.id).single();
+            
+            if (profile && profile.role === 'superadmin') {
+                showView('admin-dashboard-view');
+                loadAdminData();
             } else {
-                toggleLoginModal(false);
-                if (email === CONFIG.ADMIN_EMAIL) {
-                    showView('admin-dashboard-view');
-                    loadAdminData();
-                } else {
+                // 2. Check Company Status
+                const { data: company } = await _supabase.from('companies').select('*').eq('user_id', authData.user.id).single();
+                
+                if (!company) {
                     showView('setup-view');
+                } else {
+                    showView('ninjabooks-layout');
+                    updateUserInterface(company.status);
                 }
             }
         };
 
-        // --- ADMIN FUNCTIONALITY ---
+        function updateUserInterface(status) {
+            const container = document.getElementById('status-container');
+            if (status === 'pending') {
+                container.innerHTML = `
+                    <div class="bg-white p-10 rounded-[32px] border text-center">
+                        <h2 class="text-3xl font-black text-orange-600 mb-2">Account Pending Approval</h2>
+                        <p class="text-slate-500">Your entity data is currently being reviewed by Aslam.</p>
+                    </div>`;
+            } else if (status === 'approved') {
+                container.innerHTML = `
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="bg-blue-600 p-8 rounded-[32px] text-white">
+                            <p class="opacity-80">Total Sales</p>
+                            <h3 class="text-3xl font-bold">$0.00</h3>
+                        </div>
+                    </div>`;
+            }
+        }
+
         async function loadAdminData() {
-            const { data, error } = await _supabase.from('companies').select('*');
+            const { data, error } = await _supabase.from('companies').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('admin-table-body');
-            const empty = document.getElementById('admin-empty-state');
-            
             tbody.innerHTML = '';
+            
             if (!data || data.length === 0) {
-                empty.classList.remove('hidden');
+                document.getElementById('admin-empty-state').classList.remove('hidden');
                 return;
             }
 
-            empty.classList.add('hidden');
             data.forEach(comp => {
                 tbody.innerHTML += `
                     <tr class="border-b">
-                        <td class="p-6 font-bold text-slate-900">${comp.name}</td>
+                        <td class="p-6 font-bold">${comp.name}</td>
                         <td class="p-6 text-slate-500">${comp.email}</td>
-                        <td class="p-6 font-mono uppercase">${comp.reg_number}</td>
-                        <td class="p-6"><span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-bold text-[10px]">${comp.status}</span></td>
+                        <td class="p-6 font-mono">${comp.reg_number}</td>
+                        <td class="p-6"><span class="px-3 py-1 rounded-full font-bold text-[10px] ${comp.status === 'approved' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}">${comp.status}</span></td>
                         <td class="p-6 text-center space-x-2">
-                            <button onclick="approveCompany('${comp.id}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Approve</button>
-                            <button onclick="stealthAccess('${comp.name}')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold">Stealth View</button>
+                            ${comp.status === 'pending' ? `<button onclick="approveCompany('${comp.id}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Approve</button>` : ''}
+                            <button onclick="stealthAccess('${comp.name}')" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold">View</button>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
             });
         }
 
         async function approveCompany(id) {
-            await _supabase.from('companies').update({ status: 'approved' }).eq('id', id);
-            alert("Company Approved. Notification sent.");
-            loadAdminData();
+            const { error } = await _supabase.from('companies').update({ status: 'approved' }).eq('id', id);
+            if (!error) {
+                alert("Company Approved!");
+                loadAdminData();
+            }
         }
 
-        function stealthAccess(name) {
-            document.getElementById('god-mode-indicator').classList.remove('hidden');
-            showView('ninjabooks-layout');
-            alert("Viewing data for: " + name + ". Your access is invisible to the user.");
-        }
-
-        // --- SETUP SUBMIT ---
         document.getElementById('setup-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-setup');
-            btn.innerText = "Sending...";
-            
             const { data: { user } } = await _supabase.auth.getUser();
 
             const { error } = await _supabase.from('companies').insert([{
@@ -305,22 +306,21 @@
                 address_biz: document.getElementById('c-addr').value,
                 tax_id: document.getElementById('c-tax').value,
                 employees: document.getElementById('c-emp').value,
-                email: user.email
+                email: user.email,
+                status: 'pending'
             }]);
 
             if (error) {
-                alert(error.message);
+                alert("Error: " + error.message);
             } else {
                 emailjs.send(CONFIG.EJS_SVC, CONFIG.EJS_TMP, {
                     company_name: document.getElementById('c-name').value,
-                    user_email: user.email,
-                    admin_email: CONFIG.ADMIN_EMAIL
-                }).then(() => {
-                    alert("Application sent to Aslam!");
-                    showView('ninjabooks-layout');
+                    user_email: user.email
                 });
+                alert("Application sent to Aslam!");
+                showView('ninjabooks-layout');
+                updateUserInterface('pending');
             }
-            btn.innerText = "Submit for Approval";
         };
     </script>
 </body>
