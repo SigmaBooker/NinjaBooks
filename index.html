@@ -3,825 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigmaBooker | NinjaBooks</title>
+    <title>SigmaBooker | NinjaBooks Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-
-        /* ── View system ─────────────────────────────────────────── */
-        .view-section { display: none !important; }
-        .view-section.active { display: block !important; }
-        #ninjabooks-layout.active,
-        #admin-dashboard-view.active { display: flex !important; }
-
-        /* ── Modal ───────────────────────────────────────────────── */
-        .modal-overlay {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-active { display: flex !important; }
-
-        /* ── Toast ───────────────────────────────────────────────── */
-        #toast {
-            position: fixed;
-            bottom: 2rem; right: 2rem;
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            z-index: 9999;
-            opacity: 0;
-            transform: translateY(1rem);
-            transition: all 0.3s ease;
-            pointer-events: none;
-            max-width: 360px;
-        }
-        #toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        #toast.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        #toast.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        #toast.info    { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-
-        /* ── Spinner ─────────────────────────────────────────────── */
-        .btn-spinner {
-            display: inline-block;
-            width: 1rem; height: 1rem;
-            border: 2px solid rgba(255,255,255,0.4);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin-right: 0.5rem;
-            vertical-align: middle;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        .step-pill.active { background-color: #2563eb; color: white; }
+        .step-pill.completed { background-color: #10b981; color: white; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .input-group label { display: block; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 4px; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: 0.2s; }
+        .input-group input:focus { border-color: #2563eb; ring: 2px #bfdbfe; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body>
 
-<!-- ════════════════════════════════════════════════════════════════
-     TOAST NOTIFICATION
-════════════════════════════════════════════════════════════════ -->
-<div id="toast"></div>
+<div id="toast" class="fixed top-5 right-5 z-[100] transform translate-x-full transition-transform duration-300 px-6 py-3 rounded-xl shadow-lg text-white font-bold"></div>
 
-<!-- ════════════════════════════════════════════════════════════════
-     PUBLIC NAVIGATION
-════════════════════════════════════════════════════════════════ -->
-<nav id="public-ribbon" class="flex justify-between items-center px-10 py-5 bg-white border-b sticky top-0 z-[60]">
-    <div onclick="showView('landing-view')" class="text-2xl font-black text-blue-600 tracking-tighter cursor-pointer">SigmaBooker</div>
-    <div class="flex gap-8 items-center">
-        <button onclick="showView('landing-view')" class="font-bold text-slate-600 hover:text-blue-600 transition">Blogs</button>
-        <button onclick="showView('contact-view')" class="font-bold text-slate-600 hover:text-blue-600 transition">Contact Us</button>
-        <button onclick="toggleLoginModal(true)" class="font-bold text-slate-600 hover:text-blue-600 transition">Login</button>
-        <button onclick="showView('signup-view')" class="px-6 py-2 bg-blue-600 text-white rounded-full font-bold shadow-lg hover:bg-blue-700 transition">Sign Up</button>
+<!-- NAVIGATION -->
+<nav id="public-nav" class="bg-white border-b px-10 py-4 flex justify-between items-center sticky top-0 z-50">
+    <div class="text-2xl font-black text-blue-600 tracking-tighter">SigmaBooker</div>
+    <div id="nav-links" class="flex gap-6 font-bold text-slate-600">
+        <button onclick="showView('signup-view')" class="bg-blue-600 text-white px-6 py-2 rounded-lg">Sign Up</button>
+        <button onclick="openLogin()" class="text-blue-600">Login</button>
     </div>
 </nav>
 
-<!-- ════════════════════════════════════════════════════════════════
-     LANDING PAGE
-════════════════════════════════════════════════════════════════ -->
-<div id="landing-view" class="view-section active">
-    <header class="container mx-auto px-10 py-24 text-center">
-        <h1 class="text-6xl font-black mb-6 tracking-tight">
-            Accounting for <span class="text-blue-600">NinjaBooks</span>
-        </h1>
-        <p class="text-xl text-slate-500 max-w-2xl mx-auto">
-            Professional resources and tools for the global accounting industry.
-        </p>
-        <div class="mt-10 flex justify-center gap-4">
-            <button onclick="showView('signup-view')" class="px-8 py-4 bg-blue-600 text-white rounded-full font-bold shadow-lg hover:bg-blue-700 transition">
-                Get Started Free
-            </button>
-            <button onclick="toggleLoginModal(true)" class="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-full font-bold hover:bg-blue-50 transition">
-                Login
-            </button>
+<!-- FORMATION STEPPER -->
+<section id="setup-view" class="view-section py-12 px-6">
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border overflow-hidden">
+        <!-- Progress Bar -->
+        <div class="flex border-b">
+            <div id="step-1-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold active">1. BASIC</div>
+            <div id="step-2-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">2. DETAILS</div>
+            <div id="step-3-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">3. OPS</div>
+            <div id="step-4-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">4. FINANCE</div>
+            <div id="step-5-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">5. BANKING</div>
+            <div id="step-6-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">6. REVIEW</div>
         </div>
-    </header>
-</div>
 
-<!-- ════════════════════════════════════════════════════════════════
-     SIGN UP VIEW
-     FIX: Added onsubmit handler (was missing entirely)
-════════════════════════════════════════════════════════════════ -->
-<section id="signup-view" class="view-section min-h-[80vh] flex items-center justify-center p-6">
-    <div class="bg-white p-10 rounded-[40px] shadow-2xl w-full max-w-md border">
-        <h2 class="text-3xl font-black text-center mb-2">Create Account</h2>
-        <p class="text-center text-slate-500 mb-8 text-sm">
-            We'll send a confirmation email to verify your address.
-        </p>
-        <form id="signup-form" class="space-y-4" onsubmit="handleSignup(event)">
-            <input type="text"     id="su-name"  placeholder="Full Name"        required
-                   class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
-            <input type="email"    id="su-email" placeholder="Email Address"    required
-                   class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
-            <input type="password" id="su-pass"  placeholder="Create Password (min 6 chars)" required minlength="6"
-                   class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
-            <button type="submit" id="signup-btn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition">
-                Register
-            </button>
+        <form id="setup-form" class="p-10">
+            <!-- STEP 1: BASIC -->
+            <div id="step-1-content" class="step-content grid grid-cols-2 gap-6">
+                <div class="input-group col-span-2"><label>Company Name</label><input type="text" id="c-name" required></div>
+                <div class="input-group"><label>Business Type</label>
+                    <select id="c-type">
+                        <option>Private Limited Company</option>
+                        <option>Sole Proprietorship</option>
+                        <option>Partnership</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Industry</label>
+                    <select id="c-industry">
+                        <option>Retail</option>
+                        <option>IT / Software</option>
+                        <option>Manufacturing</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Currency</label><select id="c-currency"><option>PKR</option><option>USD</option><option>GBP</option></select></div>
+            </div>
+
+            <!-- STEP 3: OPERATIONS (LOGIC TRIGGER) -->
+            <div id="step-3-content" class="step-content hidden grid grid-cols-2 gap-6">
+                <div class="input-group"><label>Sell Products?</label><select id="ops-products"><option value="no">No</option><option value="yes">Yes</option></select></div>
+                <div class="input-group"><label>Inventory Management?</label><select id="ops-inv"><option value="no">No</option><option value="yes">Yes</option></select></div>
+                <div class="input-group"><label>Provide Services?</label><select id="ops-services"><option value="no">No</option><option value="yes">Yes</option></select></div>
+            </div>
+
+            <!-- STEP 6: REVIEW & COA -->
+            <div id="step-6-content" class="step-content hidden">
+                <h3 class="text-xl font-bold mb-4">Auto-Generated Chart of Accounts</h3>
+                <div id="coa-preview" class="space-y-2 max-h-60 overflow-y-auto border p-4 rounded-xl bg-slate-50">
+                    <!-- Dynamic COA injected here -->
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button type="button" id="prev-btn" class="hidden px-8 py-3 font-bold text-slate-400">Back</button>
+                <button type="button" id="next-btn" class="ml-auto bg-blue-600 text-white px-10 py-3 rounded-xl font-bold">Next Step</button>
+                <button type="submit" id="submit-btn" class="hidden ml-auto bg-green-600 text-white px-10 py-3 rounded-xl font-bold">Confirm & Create</button>
+            </div>
         </form>
-        <p class="text-center text-slate-500 text-sm mt-6">
-            Already have an account?
-            <button onclick="toggleLoginModal(true); showView('landing-view')" class="text-blue-600 font-bold hover:underline">Login</button>
-        </p>
     </div>
 </section>
 
-<!-- ════════════════════════════════════════════════════════════════
-     EMAIL CONFIRMATION PENDING VIEW
-     FIX: New view shown after signup — instructs user to check email
-════════════════════════════════════════════════════════════════ -->
-<section id="confirm-view" class="view-section min-h-[80vh] flex items-center justify-center p-6">
-    <div class="bg-white p-12 rounded-[40px] shadow-2xl w-full max-w-md border text-center">
-        <div class="text-6xl mb-6">📬</div>
-        <h2 class="text-3xl font-black mb-4">Check Your Email</h2>
-        <p class="text-slate-500 mb-6">
-            We sent a confirmation link to <strong id="confirm-email-display"></strong>.
-            Click it to activate your account, then come back and log in.
-        </p>
-        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-sm text-blue-700">
-            ℹ️ The link will redirect you back to this site automatically.
-            If you don't see the email, check your spam folder.
-        </div>
-        <button onclick="toggleLoginModal(true)" class="mt-8 w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition">
-            Go to Login
-        </button>
-    </div>
-</section>
-
-<!-- ════════════════════════════════════════════════════════════════
-     LOGIN MODAL
-════════════════════════════════════════════════════════════════ -->
-<div id="login-modal" class="modal-overlay">
-    <div class="bg-white p-10 rounded-[32px] shadow-2xl w-full max-w-sm relative">
-        <button onclick="toggleLoginModal(false)" class="absolute top-6 right-6 text-slate-300 hover:text-slate-600 text-3xl leading-none">&times;</button>
-        <h2 class="text-2xl font-black text-center mb-2">Welcome Back</h2>
-        <p class="text-center text-slate-500 text-sm mb-6">Login to your SigmaBooker account</p>
-        <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
-            <input type="email"    id="li-email" placeholder="Email Address" required
-                   class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="password" id="li-pass"  placeholder="Password"      required
-                   class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-            <button type="submit" id="login-btn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition">
-                Login
-            </button>
-        </form>
-        <p class="text-center text-slate-500 text-sm mt-6">
-            No account?
-            <button onclick="toggleLoginModal(false); showView('signup-view')" class="text-blue-600 font-bold hover:underline">Sign up free</button>
-        </p>
-    </div>
-</div>
-
-<!-- ════════════════════════════════════════════════════════════════
-     SUPER ADMIN DASHBOARD
-════════════════════════════════════════════════════════════════ -->
-<section id="admin-dashboard-view" class="view-section h-screen flex">
-    <aside class="w-72 bg-slate-900 text-slate-400 p-8 flex flex-col shrink-0">
-        <div class="text-white text-2xl font-black mb-12 tracking-tighter">NinjaAdmin</div>
-        <nav class="space-y-3 flex-grow">
-            <button onclick="loadAdminData()" class="w-full text-left p-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition">
-                🏢 Company Approvals
-            </button>
-            <button onclick="showToast('Coming soon', 'info')" class="w-full text-left p-4 hover:bg-slate-800 rounded-2xl transition">
-                👥 All Users
-            </button>
+<!-- MAIN APP (SUPERADMIN VIEW) -->
+<div id="app-layout" class="view-section h-screen flex">
+    <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col">
+        <div class="p-6 text-white text-2xl font-black">NinjaBooks</div>
+        <nav class="flex-1 px-4 space-y-2">
+            <div id="sa-menu" class="hidden">
+                <div class="text-[10px] text-slate-500 font-bold uppercase mb-2 px-3">Superadmin</div>
+                <div onclick="loadApprovals()" class="p-3 bg-blue-600 text-white rounded-xl cursor-pointer font-bold">🏢 Approvals</div>
+            </div>
+            <!-- Dynamic menu based on QB Roles will go here -->
         </nav>
-        <button onclick="handleLogout()" class="p-4 text-left border-t border-slate-800 hover:text-white transition">
-            ↩ Logout
-        </button>
     </aside>
-    <main class="flex-1 bg-[#f8fafc] p-12 overflow-y-auto">
-        <div class="flex items-center justify-between mb-10">
-            <h2 class="text-4xl font-black">Control Center</h2>
-            <button onclick="loadAdminData()" class="px-5 py-2 bg-white border rounded-xl text-sm font-bold hover:bg-slate-50 transition">
-                ↻ Refresh
-            </button>
-        </div>
-        <div class="bg-white border rounded-[32px] shadow-sm overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400 border-b">
-                    <tr>
-                        <th class="p-6">Company</th>
-                        <th class="p-6">User Email</th>
-                        <th class="p-6">Reg #</th>
-                        <th class="p-6">Status</th>
-                        <th class="p-6">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="admin-table-body">
-                    <tr><td colspan="5" class="p-10 text-center text-slate-400">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-</section>
-
-<!-- ════════════════════════════════════════════════════════════════
-     COMPANY SETUP VIEW
-════════════════════════════════════════════════════════════════ -->
-<section id="setup-view" class="view-section min-h-screen bg-slate-50 p-10 flex items-center justify-center">
-    <div class="max-w-4xl w-full bg-white p-12 rounded-[40px] shadow-xl border">
-        <h2 class="text-3xl font-black mb-2 border-b pb-4">Setup Your Business</h2>
-        <p class="text-slate-500 mt-4 mb-8 text-sm">
-            Fill in your company details. Your application will be reviewed by an administrator.
-        </p>
-        <form id="setup-form" class="grid grid-cols-1 md:grid-cols-2 gap-6" onsubmit="handleSetup(event)">
-            <input type="text" id="c-name" placeholder="Company Name *" required
-                   class="md:col-span-2 p-4 border rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-            <select id="c-type" class="p-4 border rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="Retail">Retail</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Services">Services</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <input type="text" id="c-reg" placeholder="Registration Number *" required
-                   class="p-4 border rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-            <textarea id="c-addr" placeholder="Business Address *" required
-                      class="md:col-span-2 p-4 border rounded-xl bg-slate-50 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-
-            <input type="text" id="c-tax" placeholder="Tax Number (optional)"
-                   class="p-4 border rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-            <input type="number" id="c-emp" placeholder="Number of Employees (optional)"
-                   class="p-4 border rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500" min="1">
-
-            <div class="md:col-span-2 flex justify-end gap-4">
-                <button type="submit" id="setup-btn"
-                        class="bg-green-600 text-white px-12 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-700 transition">
-                    Submit for Approval
-                </button>
-            </div>
-        </form>
-    </div>
-</section>
-
-<!-- ════════════════════════════════════════════════════════════════
-     NINJABOOKS MAIN INTERFACE
-════════════════════════════════════════════════════════════════ -->
-<div id="ninjabooks-layout" class="view-section h-screen flex overflow-hidden">
-    <aside class="w-64 bg-[#0f172a] text-slate-400 p-6 flex flex-col shrink-0">
-        <div class="text-white text-xl font-black mb-10">NinjaBooks</div>
-        <nav class="space-y-1 flex-grow overflow-y-auto">
-            <div class="flex items-center gap-3 p-3 hover:bg-slate-800 rounded-xl cursor-pointer text-white font-medium transition">
-                🏠 Dashboard
-            </div>
-            <div class="flex items-center gap-3 p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition">
-                📄 Invoices
-            </div>
-            <div class="flex items-center gap-3 p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition">
-                💰 Expenses
-            </div>
-            <div class="flex items-center gap-3 p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition">
-                🏦 Banking
-            </div>
-            <div class="flex items-center gap-3 p-3 hover:bg-slate-800 rounded-xl cursor-pointer transition">
-                📊 Reports
-            </div>
-        </nav>
-        <button onclick="handleLogout()" class="p-3 border-t border-slate-800 text-left hover:text-white transition">
-            ↩ Logout
-        </button>
-    </aside>
-    <main class="flex-1 flex flex-col bg-white overflow-hidden">
-        <header class="h-20 border-b flex items-center justify-between px-8 shrink-0">
-            <span class="text-blue-600 font-black text-2xl">NinjaBooks</span>
-            <span id="nb-user-email" class="text-slate-500 text-sm"></span>
-        </header>
-        <div id="dashboard-status" class="p-10 overflow-y-auto flex-1"></div>
-    </main>
+    <main class="flex-1 p-10 overflow-y-auto" id="main-content"></main>
 </div>
 
-<!-- ════════════════════════════════════════════════════════════════
-     JAVASCRIPT — ALL BUGS FIXED
-════════════════════════════════════════════════════════════════ -->
+<!-- LOGIN MODAL -->
+<div id="login-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[100]">
+    <div class="bg-white p-10 rounded-3xl w-96 shadow-2xl">
+        <h2 class="text-2xl font-bold mb-6">Login</h2>
+        <input type="email" id="li-email" placeholder="Email" class="w-full p-4 border rounded-xl mb-4">
+        <input type="password" id="li-pass" placeholder="Password" class="w-full p-4 border rounded-xl mb-6">
+        <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold">Sign In</button>
+    </div>
+</div>
+
 <script>
-'use strict';
-
-/* ─── CONFIG ─────────────────────────────────────────────────────
-   FIX 1: Missing comma after EJS_PUB caused a syntax error that
-   crashed the entire script. Every function below was unreachable.
-   FIX 2: SB_KEY must be the "anon" JWT (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmenNwdWZwbG5rcXZya2ppZXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3ODU4NzEsImV4cCI6MjA5MDM2MTg3MX0.zweR1FV1syPMfXd8BizP57W-Ko3kf424rVlIqnUFsmM).
-          Replace the placeholder below with your real anon key
-          from Supabase → Project Settings → API.
-──────────────────────────────────────────────────────────────── */
 const CONFIG = {
-    SB_URL:      'https://wfzspufplnkqvrkjieuc.supabase.co',
-    SB_KEY:      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmenNwdWZwbG5rcXZya2ppZXVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3ODU4NzEsImV4cCI6MjA5MDM2MTg3MX0.zweR1FV1syPMfXd8BizP57W-Ko3kf424rVlIqnUFsmM',
-    EJS_SVC:     'service_adbqgxl',
-    EJS_TMP_NEW: 'template_uv8n1b4',              // template for new company notification to admin
-    EJS_TMP_APR: 'template_approved',             // template for approval notification to user (create this in EmailJS)
-    EJS_PUB:     'd3ltqxtM03wNxFm02',             // ← comma was missing here — now fixed
-    ADMIN_EMAIL: 'aslam.975114@gmail.com',
-    /*
-     * FIX 3: SITE URL — set this to your GitHub Pages URL.
-     * Also set it in Supabase → Auth → URL Configuration → Site URL.
-     * This is what fixes the broken confirmation link.
-     * Example: 'https://yourusername.github.io/your-repo'
-     */
-    SITE_URL:    'https://sigmabooker.github.io/NinjaBooks/'
+    SB_URL: 'https://ptxegnanbbnflcndqvdp.supabase.co',
+    SB_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0eGVnbmFuYmJuZmxjbmRxdmRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTEyMDIsImV4cCI6MjA5MDU2NzIwMn0.8oH1qM4vvQWvji3sR8PkyhLYhjlONuu4zy_i-YLrtmU'
 };
 
-/* ─── SUPABASE CLIENT ────────────────────────────────────────── */
 const _sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
+let currentStep = 1;
 
-/* ─── EMAILJS INIT ───────────────────────────────────────────── */
-emailjs.init(CONFIG.EJS_PUB);
+// --- STEPPER LOGIC ---
+document.getElementById('next-btn').onclick = () => {
+    if (currentStep < 6) {
+        document.getElementById(`step-${currentStep}-content`).classList.add('hidden');
+        document.getElementById(`step-${currentStep}-pill`).classList.replace('active', 'completed');
+        currentStep++;
+        document.getElementById(`step-${currentStep}-content`).classList.remove('hidden');
+        document.getElementById(`step-${currentStep}-pill`).classList.add('active');
+        if(currentStep === 6) generateCOA();
+        toggleButtons();
+    }
+};
 
-
-/* ════════════════════════════════════════════════════════════════
-   UTILITY HELPERS
-════════════════════════════════════════════════════════════════ */
-
-/** Show a toast message. type: 'success' | 'error' | 'info' */
-function showToast(msg, type = 'info', duration = 4000) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = `show ${type}`;
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => { el.className = ''; }, duration);
+function toggleButtons() {
+    document.getElementById('prev-btn').classList.toggle('hidden', currentStep === 1);
+    document.getElementById('next-btn').classList.toggle('hidden', currentStep === 6);
+    document.getElementById('submit-btn').classList.toggle('hidden', currentStep !== 6);
 }
 
-/** Switch visible views and toggle the public nav */
-function showView(viewId) {
-    const privateViews = ['ninjabooks-layout', 'admin-dashboard-view', 'setup-view', 'confirm-view'];
-    const nav = document.getElementById('public-ribbon');
-    nav.style.display = privateViews.includes(viewId) ? 'none' : 'flex';
+// --- COA GENERATION LOGIC ---
+function generateCOA() {
+    const coaList = [
+        { name: 'Cash', type: 'Asset' },
+        { name: 'Accounts Receivable', type: 'Asset' },
+        { name: 'Accounts Payable', type: 'Liability' },
+        { name: 'Owner Equity', type: 'Equity' }
+    ];
 
-    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById(viewId);
-    if (target) target.classList.add('active');
-}
-
-/** Toggle login modal */
-function toggleLoginModal(show) {
-    document.getElementById('login-modal').classList.toggle('modal-active', show);
-}
-
-/** Set loading state on a button */
-function setLoading(btnId, loading, originalText = null) {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    btn.disabled = loading;
-    if (loading) {
-        btn.dataset.original = btn.textContent;
-        btn.innerHTML = `<span class="btn-spinner"></span> Please wait…`;
-    } else {
-        btn.innerHTML = originalText || btn.dataset.original || btn.textContent;
+    if(document.getElementById('ops-inv').value === 'yes') {
+        coaList.push({ name: 'Inventory', type: 'Asset' }, { name: 'COGS', type: 'Expense' });
     }
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   AUTH FLOW — CONFIRMATION CALLBACK HANDLER
-   FIX 3: On page load, Supabase appends #access_token=... to the
-   URL after the user clicks the confirmation link. Without this
-   handler, the session is never established and the link appears
-   "broken". This exchanges the token and routes the user properly.
-════════════════════════════════════════════════════════════════ */
-async function handleAuthCallback() {
-    const hash = window.location.hash;
-
-    // Only act if there's a Supabase token in the URL
-    if (!hash.includes('access_token') && !hash.includes('type=recovery')) return;
-
-    const { data: { session }, error } = await _sb.auth.getSession();
-
-    if (error || !session) {
-        showToast('Email confirmation failed. Please try signing up again.', 'error');
-        showView('landing-view');
-        return;
+    if(document.getElementById('ops-services').value === 'yes') {
+        coaList.push({ name: 'Service Revenue', type: 'Revenue' });
     }
 
-    // Clean the hash from the URL (looks cleaner)
-    window.history.replaceState({}, document.title, window.location.pathname);
-
-    showToast('✅ Email confirmed! Please complete your login.', 'success');
-    toggleLoginModal(true);
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   SIGN UP
-   FIX 4: This handler was completely missing. The form submitted
-   but nothing happened. Now wired up correctly.
-════════════════════════════════════════════════════════════════ */
-async function handleSignup(e) {
-    e.preventDefault();
-    const name  = document.getElementById('su-name').value.trim();
-    const email = document.getElementById('su-email').value.trim();
-    const pass  = document.getElementById('su-pass').value;
-
-    setLoading('signup-btn', true);
-
-    const { error } = await _sb.auth.signUp({
-        email,
-        password: pass,
-        options: {
-            data: { full_name: name },
-            /*
-             * FIX 3 (continued): emailRedirectTo MUST point to your
-             * live GitHub Pages URL. Without this, Supabase sends a
-             * link back to localhost which is always broken.
-             */
-            emailRedirectTo: CONFIG.SITE_URL
-        }
-    });
-
-    setLoading('signup-btn', false);
-
-    if (error) {
-        showToast(`Sign up failed: ${error.message}`, 'error');
-        return;
-    }
-
-    // Show the "check your email" screen
-    document.getElementById('confirm-email-display').textContent = email;
-    showView('confirm-view');
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   LOGIN
-════════════════════════════════════════════════════════════════ */
-async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('li-email').value.trim();
-    const pass  = document.getElementById('li-pass').value;
-
-    setLoading('login-btn', true);
-
-    const { data: auth, error } = await _sb.auth.signInWithPassword({ email, password: pass });
-
-    setLoading('login-btn', false);
-
-    if (error) {
-        showToast(`Login failed: ${error.message}`, 'error');
-        return;
-    }
-
-    toggleLoginModal(false);
-    await routeUserAfterLogin(auth.user);
-}
-
-/** Central routing logic after a successful login */
-async function routeUserAfterLogin(user) {
-    // Fetch profile to check role
-    const { data: profile, error: profileError } = await _sb
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-    if (profileError && profileError.code !== 'PGRST116') {
-        showToast('Could not load your profile. Please try again.', 'error');
-        return;
-    }
-
-    if (profile?.role === 'superadmin') {
-        showView('admin-dashboard-view');
-        loadAdminData();
-        return;
-    }
-
-    // Regular user — check if they have a company
-    const { data: company } = await _sb
-        .from('companies')
-        .select('id, status, name')
-        .eq('user_id', user.id)
-        .maybeSingle(); // maybeSingle() returns null (not an error) when no row found
-
-    document.getElementById('nb-user-email').textContent = user.email;
-
-    if (!company) {
-        showView('setup-view');
-    } else {
-        showView('ninjabooks-layout');
-        renderUserDashboard(company.status, company.name);
-    }
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   DASHBOARD STATUS RENDER
-════════════════════════════════════════════════════════════════ */
-function renderUserDashboard(status, companyName = 'Your Company') {
-    const container = document.getElementById('dashboard-status');
-
-    if (status === 'pending') {
-        container.innerHTML = `
-            <div class="max-w-xl mx-auto mt-10">
-                <div class="bg-orange-50 border border-orange-200 p-10 rounded-3xl text-center">
-                    <div class="text-5xl mb-4">⏳</div>
-                    <h2 class="text-2xl font-bold text-orange-700 mb-2">Pending Admin Approval</h2>
-                    <p class="text-slate-600">
-                        Your company <strong>${escapeHtml(companyName)}</strong> has been submitted
-                        and is currently under review. You'll receive an email once it's approved.
-                    </p>
-                </div>
-            </div>`;
-    } else if (status === 'approved') {
-        container.innerHTML = `
-            <div>
-                <h2 class="text-3xl font-bold mb-2">Welcome to NinjaBooks 🎉</h2>
-                <p class="text-slate-500 mb-8">Your company <strong>${escapeHtml(companyName)}</strong> is active.</p>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    ${['Total Revenue','Outstanding Invoices','Expenses','Net Profit'].map(label => `
-                        <div class="bg-slate-50 border rounded-2xl p-6">
-                            <div class="text-sm text-slate-400 font-medium mb-1">${label}</div>
-                            <div class="text-2xl font-black text-slate-800">$0.00</div>
-                        </div>`).join('')}
-                </div>
-            </div>`;
-    } else {
-        container.innerHTML = `
-            <div class="bg-red-50 border border-red-200 p-10 rounded-3xl text-center max-w-xl mx-auto mt-10">
-                <h2 class="text-xl font-bold text-red-600">Account Suspended</h2>
-                <p class="text-slate-600 mt-2">Please contact support.</p>
-            </div>`;
-    }
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   COMPANY SETUP
-   FIX 5: RLS was missing an INSERT policy — the insert was always
-   silently rejected. Add this to Supabase SQL:
-       CREATE POLICY "Users insert own company" ON public.companies
-       FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
-   FIX 6: EmailJS was never called. Now sends admin notification email.
-════════════════════════════════════════════════════════════════ */
-async function handleSetup(e) {
-    e.preventDefault();
-    setLoading('setup-btn', true);
-
-    const { data: { user } } = await _sb.auth.getUser();
-
-    if (!user) {
-        showToast('Session expired. Please login again.', 'error');
-        setLoading('setup-btn', false);
-        toggleLoginModal(true);
-        return;
-    }
-
-    const companyName = document.getElementById('c-name').value.trim();
-
-    const payload = {
-        user_id:     user.id,
-        email:       user.email,
-        name:        companyName,
-        type:        document.getElementById('c-type').value,
-        reg_number:  document.getElementById('c-reg').value.trim(),
-        address_biz: document.getElementById('c-addr').value.trim(),
-        tax_id:      document.getElementById('c-tax').value.trim() || null,
-        employees:   document.getElementById('c-emp').value || null,
-        status:      'pending'
-    };
-
-    const { error } = await _sb.from('companies').insert([payload]);
-
-    if (error) {
-        console.error('Company insert error:', error);
-        showToast(`Setup failed: ${error.message}`, 'error');
-        setLoading('setup-btn', false);
-        return;
-    }
-
-    // FIX 6: Notify superadmin via EmailJS
-    try {
-        await emailjs.send(CONFIG.EJS_SVC, CONFIG.EJS_TMP_NEW, {
-            to_email:    CONFIG.ADMIN_EMAIL,
-            from_name:   user.email,
-            company_name: companyName,
-            reg_number:  payload.reg_number,
-            company_type: payload.type,
-            message:     `A new company "${companyName}" has been submitted for approval by ${user.email}.`
-        });
-    } catch (ejsErr) {
-        // Email failure should NOT block the user — just log it
-        console.warn('EmailJS notification failed:', ejsErr);
-    }
-
-    setLoading('setup-btn', false);
-    showToast('Application submitted! You will be notified by email upon approval.', 'success');
-    showView('ninjabooks-layout');
-    document.getElementById('nb-user-email').textContent = user.email;
-    renderUserDashboard('pending', companyName);
-}
-
-
-/* ════════════════════════════════════════════════════════════════
-   ADMIN — LOAD COMPANIES
-════════════════════════════════════════════════════════════════ */
-async function loadAdminData() {
-    const tbody = document.getElementById('admin-table-body');
-    tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-400">Loading…</td></tr>';
-
-    const { data, error } = await _sb
-        .from('companies')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-red-500">${error.message}</td></tr>`;
-        return;
-    }
-
-    if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-400">No company applications yet.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = data.map(comp => `
-        <tr class="border-b hover:bg-slate-50 transition">
-            <td class="p-6 font-bold">${escapeHtml(comp.name ?? '—')}</td>
-            <td class="p-6 text-slate-500 text-sm">${escapeHtml(comp.email ?? '—')}</td>
-            <td class="p-6 font-mono text-sm">${escapeHtml(comp.reg_number ?? '—')}</td>
-            <td class="p-6">
-                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide
-                    ${comp.status === 'approved'
-                        ? 'bg-green-100 text-green-700'
-                        : comp.status === 'rejected'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-orange-100 text-orange-700'}">
-                    ${escapeHtml(comp.status ?? 'pending')}
-                </span>
-            </td>
-            <td class="p-6 flex gap-2">
-                ${comp.status === 'pending' ? `
-                    <button onclick="approveCompany('${comp.id}', '${escapeHtml(comp.email ?? '')}', '${escapeHtml(comp.name ?? '')}')"
-                            class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-700 transition">
-                        ✓ Approve
-                    </button>
-                    <button onclick="rejectCompany('${comp.id}', '${escapeHtml(comp.email ?? '')}', '${escapeHtml(comp.name ?? '')}')"
-                            class="bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-200 transition">
-                        ✗ Reject
-                    </button>
-                ` : ''}
-            </td>
-        </tr>
+    const container = document.getElementById('coa-preview');
+    container.innerHTML = coaList.map(a => `
+        <div class="flex justify-between p-2 bg-white border rounded-lg text-sm">
+            <span class="font-bold">${a.name}</span>
+            <span class="text-slate-400 uppercase text-[10px]">${a.type}</span>
+        </div>
     `).join('');
 }
 
-/* ════════════════════════════════════════════════════════════════
-   ADMIN — APPROVE COMPANY
-   FIX 7: Approval now sends an email to the user, not just updates DB.
-════════════════════════════════════════════════════════════════ */
-async function approveCompany(id, userEmail, companyName) {
-    const { error } = await _sb
-        .from('companies')
-        .update({ status: 'approved' })
-        .eq('id', id);
-
-    if (error) {
-        showToast(`Approval failed: ${error.message}`, 'error');
-        return;
-    }
-
-    // Notify user by email
-    try {
-        await emailjs.send(CONFIG.EJS_SVC, CONFIG.EJS_TMP_APR, {
-            to_email:     userEmail,
-            company_name: companyName,
-            message:      `Congratulations! Your company "${companyName}" has been approved. You can now log in and start using NinjaBooks.`,
-            login_url:    CONFIG.SITE_URL
-        });
-        showToast(`✅ Approved & notification sent to ${userEmail}`, 'success');
-    } catch (ejsErr) {
-        console.warn('Approval email failed:', ejsErr);
-        showToast('Approved, but email notification failed.', 'info');
-    }
-
-    loadAdminData();
+// --- SUPERADMIN APPROVALS ---
+async function loadApprovals() {
+    const { data: comps } = await _sb.from('companies').select('*').eq('status', 'pending');
+    const main = document.getElementById('main-content');
+    main.innerHTML = `
+        <h1 class="text-3xl font-black mb-8">Pending Company Approvals</h1>
+        <div class="grid gap-4">
+            ${comps.map(c => `
+                <div class="bg-white p-6 rounded-2xl border flex justify-between items-center">
+                    <div>
+                        <div class="font-black text-lg">${c.name}</div>
+                        <div class="text-sm text-slate-500">${c.industry} | ${c.email}</div>
+                    </div>
+                    <button onclick="approveCompany('${c.id}')" class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold">Approve Entity</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
-/* ════════════════════════════════════════════════════════════════
-   ADMIN — REJECT COMPANY
-════════════════════════════════════════════════════════════════ */
-async function rejectCompany(id, userEmail, companyName) {
-    if (!confirm(`Reject "${companyName}"? This cannot be undone.`)) return;
+async function approveCompany(id) {
+    const { error } = await _sb.from('companies').update({ status: 'approved' }).eq('id', id);
+    if(!error) { alert('Company Approved!'); loadApprovals(); }
+}
 
-    const { error } = await _sb
-        .from('companies')
-        .update({ status: 'rejected' })
-        .eq('id', id);
-
-    if (error) {
-        showToast(`Rejection failed: ${error.message}`, 'error');
-        return;
+async function checkAuth() {
+    const { data: { user } } = await _sb.auth.getUser();
+    if(user) {
+        const { data: prof } = await _sb.from('profiles').select('*').eq('id', user.id).single();
+        if(prof.role === 'superadmin') {
+            document.getElementById('app-layout').classList.add('active');
+            document.getElementById('sa-menu').classList.remove('hidden');
+            loadApprovals();
+        } else {
+            // Check if they have an approved company
+            const { data: comp } = await _sb.from('companies').select('*').eq('owner_id', user.id).single();
+            if(!comp) showView('setup-view');
+            else if(comp.status === 'pending') alert('Your company is awaiting Aslam\'s approval.');
+            else { document.getElementById('app-layout').classList.add('active'); loadDashboard(); }
+        }
+    } else {
+        showView('signup-view');
     }
-
-    showToast(`Company rejected.`, 'info');
-    loadAdminData();
 }
 
-/* ════════════════════════════════════════════════════════════════
-   LOGOUT
-════════════════════════════════════════════════════════════════ */
-async function handleLogout() {
-    await _sb.auth.signOut();
-    showView('landing-view');
-    showToast('Logged out successfully.', 'info');
+function showView(id) {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
 
-/* ════════════════════════════════════════════════════════════════
-   XSS PROTECTION — never inject user data into HTML without this
-════════════════════════════════════════════════════════════════ */
-function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-/* ════════════════════════════════════════════════════════════════
-   BOOT — runs on every page load
-════════════════════════════════════════════════════════════════ */
-(async function boot() {
-    // Step 1: Handle Supabase email confirmation callback (#access_token in URL)
-    await handleAuthCallback();
-
-    // Step 2: Check if user already has an active session (e.g. page refresh)
-    const { data: { session } } = await _sb.auth.getSession();
-    if (session?.user) {
-        await routeUserAfterLogin(session.user);
-    }
-})();
+window.onload = checkAuth;
 </script>
-
-<!-- ════════════════════════════════════════════════════════════════
-     SUPABASE SETUP INSTRUCTIONS (read before deploying)
-════════════════════════════════════════════════════════════════
-
-STEP 1 — Fix the Anon Key
-  Go to: Supabase → Project Settings → API
-  Copy the "anon public" key (starts with eyJ...)
-  Paste it into CONFIG.SB_KEY above, replacing 'YOUR_SUPABASE_ANON_KEY_HERE'
-
-STEP 2 — Fix Broken Confirmation Links
-  Go to: Supabase → Authentication → URL Configuration
-  Set "Site URL" to your GitHub Pages URL
-  Example: https://yourusername.github.io/your-repo
-  Also update CONFIG.SITE_URL in this file to the same URL.
-
-STEP 3 — Make Yourself Superadmin
-  Go to: Supabase → SQL Editor → New Query
-  First sign up via the app so your account exists, then run:
-
-    UPDATE public.profiles
-    SET role = 'superadmin'
-    WHERE id = (
-        SELECT id FROM auth.users WHERE email = 'aslam.975114@gmail.com'
-    );
-
-STEP 4 — Add Missing INSERT Policy for companies (fixes setup form)
-  Run this in Supabase SQL Editor:
-
-    CREATE POLICY "Users insert own company" ON public.companies
-    FOR INSERT TO authenticated
-    WITH CHECK (auth.uid() = user_id);
-
-STEP 5 — Create EmailJS Approval Template
-  In EmailJS → Email Templates, create a template named 'template_approved'
-  with variables: {{to_email}}, {{company_name}}, {{message}}, {{login_url}}
-  Update CONFIG.EJS_TMP_APR in this file to match your template ID.
-
-STEP 6 — Profile Auto-Creation Trigger (recommended)
-  Run this so every new signup gets a profile row automatically:
-
-    CREATE OR REPLACE FUNCTION public.handle_new_user()
-    RETURNS TRIGGER AS $$
-    BEGIN
-        INSERT INTO public.profiles (id, full_name, role)
-        VALUES (
-            NEW.id,
-            NEW.raw_user_meta_data->>'full_name',
-            'user'
-        )
-        ON CONFLICT (id) DO NOTHING;
-        RETURN NEW;
-    END;
-    $$ LANGUAGE plpgsql SECURITY DEFINER;
-
-    DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-    CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
-
-════════════════════════════════════════════════════════════════ -->
 </body>
 </html>
