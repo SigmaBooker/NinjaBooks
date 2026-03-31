@@ -6,218 +6,343 @@
     <title>SigmaBooker | NinjaBooks Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
-        .step-pill.active { background-color: #2563eb; color: white; }
-        .step-pill.completed { background-color: #10b981; color: white; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; }
         .view-section { display: none; }
         .view-section.active { display: block; }
-        .input-group label { display: block; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 4px; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; transition: 0.2s; }
-        .input-group input:focus { border-color: #2563eb; ring: 2px #bfdbfe; }
+        #app-layout.active { display: flex !important; }
+        .step-pill { transition: 0.3s; border-bottom: 4px solid transparent; cursor: default; }
+        .step-pill.active { border-color: #2563eb; color: #2563eb; font-weight: 900; }
+        .step-pill.completed { border-color: #10b981; color: #10b981; }
+        .input-box { width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; transition: 0.2s; background: #fff; }
+        .input-box:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+        .btn-primary { background: #2563eb; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 700; transition: 0.2s; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
     </style>
 </head>
 <body>
 
-<div id="toast" class="fixed top-5 right-5 z-[100] transform translate-x-full transition-transform duration-300 px-6 py-3 rounded-xl shadow-lg text-white font-bold"></div>
+<div id="toast" class="fixed top-6 right-6 z-[200] transform translate-x-[150%] transition-all duration-500 px-6 py-4 rounded-2xl shadow-2xl text-white font-bold"></div>
 
 <!-- NAVIGATION -->
-<nav id="public-nav" class="bg-white border-b px-10 py-4 flex justify-between items-center sticky top-0 z-50">
-    <div class="text-2xl font-black text-blue-600 tracking-tighter">SigmaBooker</div>
-    <div id="nav-links" class="flex gap-6 font-bold text-slate-600">
-        <button onclick="showView('signup-view')" class="bg-blue-600 text-white px-6 py-2 rounded-lg">Sign Up</button>
-        <button onclick="openLogin()" class="text-blue-600">Login</button>
+<nav id="public-nav" class="bg-white/80 backdrop-blur-md border-b px-10 py-5 flex justify-between items-center sticky top-0 z-50">
+    <div class="text-3xl font-black text-blue-700 tracking-tighter cursor-pointer" onclick="location.reload()">SigmaBooker</div>
+    <div id="nav-links" class="flex gap-8 items-center font-bold text-slate-600">
+        <button onclick="showView('landing-view')" class="hover:text-blue-600">Services</button>
+        <button onclick="showView('contact-view')" class="hover:text-blue-600">Contact Us</button>
+        <button onclick="openLogin()" class="text-blue-600 font-black">Login</button>
+        <button onclick="showView('signup-view')" class="bg-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:scale-105 transition">Sign Up</button>
     </div>
 </nav>
 
-<!-- FORMATION STEPPER -->
-<section id="setup-view" class="view-section py-12 px-6">
-    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border overflow-hidden">
-        <!-- Progress Bar -->
-        <div class="flex border-b">
-            <div id="step-1-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold active">1. BASIC</div>
-            <div id="step-2-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">2. DETAILS</div>
-            <div id="step-3-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">3. OPS</div>
-            <div id="step-4-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">4. FINANCE</div>
-            <div id="step-5-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">5. BANKING</div>
-            <div id="step-6-pill" class="step-pill flex-1 p-4 text-center text-xs font-bold">6. REVIEW</div>
+<!-- 1. LANDING PAGE -->
+<section id="landing-view" class="view-section active py-32 text-center">
+    <div class="max-w-4xl mx-auto px-6">
+        <h1 class="text-8xl font-black tracking-tighter mb-8 leading-none">Accounting for <span class="text-blue-700">Ninjas.</span></h1>
+        <p class="text-2xl text-slate-500 font-medium mb-12">The world's most intuitive cloud accounting software for retail, services, and growth.</p>
+        <button onclick="showView('signup-view')" class="bg-slate-900 text-white px-12 py-5 rounded-full font-black text-xl shadow-2xl hover:bg-black transition">Create My Entity</button>
+    </div>
+</section>
+
+<!-- 2. CONTACT US -->
+<section id="contact-view" class="view-section py-20">
+    <div class="max-w-xl mx-auto bg-white p-12 rounded-[40px] shadow-2xl border">
+        <h2 class="text-4xl font-black mb-4 tracking-tighter">Get in Touch</h2>
+        <p class="text-slate-500 mb-8 font-medium">Have a question? We usually respond within 2 hours.</p>
+        <form class="space-y-4">
+            <div><label>Full Name</label><input type="text" class="input-box"></div>
+            <div><label>Email Address</label><input type="email" class="input-box"></div>
+            <div><label>Message</label><textarea class="input-box h-32"></textarea></div>
+            <button type="button" onclick="toast('Message Sent!')" class="w-full btn-primary">Send Message</button>
+        </form>
+    </div>
+</section>
+
+<!-- 3. SIGNUP -->
+<section id="signup-view" class="view-section py-20">
+    <div class="max-w-md mx-auto bg-white p-10 rounded-[40px] shadow-2xl border">
+        <h2 class="text-3xl font-black mb-8 text-center tracking-tighter">New Account</h2>
+        <form onsubmit="handleSignup(event)" class="space-y-5">
+            <div><label>Full Name</label><input type="text" id="su-name" required class="input-box" placeholder="Aslam Khan"></div>
+            <div><label>Email Address</label><input type="email" id="su-email" required class="input-box" placeholder="name@company.com"></div>
+            <div><label>Create Password</label><input type="password" id="su-pass" required class="input-box" placeholder="••••••••"></div>
+            <button type="submit" id="signup-btn" class="w-full btn-primary text-lg mt-4">Create Account</button>
+        </form>
+    </div>
+</section>
+
+<!-- 4. 6-STEP COMPANY FORMATION -->
+<section id="setup-view" class="view-section py-10 bg-slate-50 min-h-screen">
+    <div class="max-w-5xl mx-auto bg-white rounded-[40px] shadow-2xl border overflow-hidden">
+        <!-- Progress Pills -->
+        <div class="flex bg-slate-50 border-b overflow-x-auto">
+            <div id="step-pill-1" class="step-pill flex-1 min-w-[120px] p-6 text-center text-[10px] font-black uppercase active">1. Basic</div>
+            <div id="step-pill-2" class="step-pill flex-1 min-w-[120px] p-6 text-center text-[10px] font-black uppercase">2. Details</div>
+            <div id="step-pill-3" class="step-pill flex-1 min-w-[120px] p-6 text-center text-[10px] font-black uppercase">3. Ops</div>
+            <div id="step-pill-4" class="step-pill flex-1 min-w-[120px] p-6 text-center text-[10px] font-black uppercase">4. Finance</div>
+            <div id="step-pill-5" class="step-pill flex-1 min-w-[120px] p-6 text-center text-[10px] font-black uppercase">5. Banking</div>
+            <div id="step-pill-6" class="step-pill flex-1 min-w-[120px] p-6 text-center text-[10px] font-black uppercase">6. Review</div>
         </div>
 
-        <form id="setup-form" class="p-10">
-            <!-- STEP 1: BASIC -->
-            <div id="step-1-content" class="step-content grid grid-cols-2 gap-6">
-                <div class="input-group col-span-2"><label>Company Name</label><input type="text" id="c-name" required></div>
-                <div class="input-group"><label>Business Type</label>
-                    <select id="c-type">
+        <form id="formation-form" class="p-12">
+            <!-- Step 1 -->
+            <div id="step-1" class="step-content grid grid-cols-2 gap-6">
+                <div class="col-span-2"><label>Company Name</label><input type="text" id="c-name" required class="input-box"></div>
+                <div><label>Business Type</label>
+                    <select id="c-type" class="input-box">
                         <option>Private Limited Company</option>
                         <option>Sole Proprietorship</option>
-                        <option>Partnership</option>
+                        <option>LLP Partnership</option>
                     </select>
                 </div>
-                <div class="input-group"><label>Industry</label>
-                    <select id="c-industry">
-                        <option>Retail</option>
-                        <option>IT / Software</option>
+                <div><label>Industry</label>
+                    <select id="c-industry" class="input-box">
+                        <option>Retail / Wholesale</option>
+                        <option>IT / Consulting</option>
                         <option>Manufacturing</option>
                     </select>
                 </div>
-                <div class="input-group"><label>Currency</label><select id="c-currency"><option>PKR</option><option>USD</option><option>GBP</option></select></div>
+                <div><label>Country</label><select id="c-country" class="input-box"><option>Pakistan</option><option>UK</option><option>USA</option></select></div>
+                <div><label>Currency</label><select id="c-currency" class="input-box"><option>PKR</option><option>USD</option><option>GBP</option></select></div>
             </div>
 
-            <!-- STEP 3: OPERATIONS (LOGIC TRIGGER) -->
-            <div id="step-3-content" class="step-content hidden grid grid-cols-2 gap-6">
-                <div class="input-group"><label>Sell Products?</label><select id="ops-products"><option value="no">No</option><option value="yes">Yes</option></select></div>
-                <div class="input-group"><label>Inventory Management?</label><select id="ops-inv"><option value="no">No</option><option value="yes">Yes</option></select></div>
-                <div class="input-group"><label>Provide Services?</label><select id="ops-services"><option value="no">No</option><option value="yes">Yes</option></select></div>
+            <!-- Step 3 -->
+            <div id="step-3" class="step-content hidden grid grid-cols-2 gap-6">
+                <div><label>Do you sell products?</label><select id="ops-products" class="input-box"><option value="no">No</option><option value="yes">Yes</option></select></div>
+                <div><label>Inventory Management?</label><select id="ops-inv" class="input-box"><option value="no">No</option><option value="yes">Yes</option></select></div>
+                <div><label>Provide Services?</label><select id="ops-services" class="input-box"><option value="no">No</option><option value="yes">Yes</option></select></div>
+                <div><label>Multi-Currency?</label><select id="ops-multi" class="input-box"><option value="no">No</option><option value="yes">Yes</option></select></div>
             </div>
 
-            <!-- STEP 6: REVIEW & COA -->
-            <div id="step-6-content" class="step-content hidden">
-                <h3 class="text-xl font-bold mb-4">Auto-Generated Chart of Accounts</h3>
-                <div id="coa-preview" class="space-y-2 max-h-60 overflow-y-auto border p-4 rounded-xl bg-slate-50">
-                    <!-- Dynamic COA injected here -->
-                </div>
+            <!-- Step 6 -->
+            <div id="step-6" class="step-content hidden">
+                <h3 class="text-2xl font-black mb-4">Final Review</h3>
+                <p class="text-slate-500 mb-8 font-medium">NinjaBooks will automatically generate your Chart of Accounts based on these selections:</p>
+                <div id="coa-preview" class="grid grid-cols-2 gap-3 bg-slate-50 p-8 rounded-3xl border h-64 overflow-y-auto"></div>
             </div>
 
-            <div class="mt-10 flex justify-between">
-                <button type="button" id="prev-btn" class="hidden px-8 py-3 font-bold text-slate-400">Back</button>
-                <button type="button" id="next-btn" class="ml-auto bg-blue-600 text-white px-10 py-3 rounded-xl font-bold">Next Step</button>
-                <button type="submit" id="submit-btn" class="hidden ml-auto bg-green-600 text-white px-10 py-3 rounded-xl font-bold">Confirm & Create</button>
+            <div class="mt-12 flex justify-between items-center border-t pt-8">
+                <button type="button" id="prev-btn" class="hidden font-black text-slate-400 hover:text-slate-900 transition">← Previous</button>
+                <button type="button" id="next-btn" class="ml-auto btn-primary">Continue</button>
+                <button type="submit" id="submit-btn" class="hidden ml-auto bg-green-600 text-white px-12 py-4 rounded-xl font-black shadow-xl hover:bg-green-700 transition">Confirm & Submit</button>
             </div>
         </form>
     </div>
 </section>
 
-<!-- MAIN APP (SUPERADMIN VIEW) -->
+<!-- 5. NINJABOOKS DASHBOARD LAYOUT -->
 <div id="app-layout" class="view-section h-screen flex">
-    <aside class="w-64 bg-slate-900 text-slate-400 flex flex-col">
-        <div class="p-6 text-white text-2xl font-black">NinjaBooks</div>
-        <nav class="flex-1 px-4 space-y-2">
-            <div id="sa-menu" class="hidden">
-                <div class="text-[10px] text-slate-500 font-bold uppercase mb-2 px-3">Superadmin</div>
-                <div onclick="loadApprovals()" class="p-3 bg-blue-600 text-white rounded-xl cursor-pointer font-bold">🏢 Approvals</div>
+    <!-- Sidebar -->
+    <aside class="w-72 bg-[#0f172a] text-slate-400 flex flex-col shrink-0">
+        <div class="p-8 text-white text-3xl font-black tracking-tighter">NinjaBooks</div>
+        <nav class="flex-1 px-4 space-y-1">
+            <div onclick="loadDashboard()" class="p-4 hover:bg-slate-800 rounded-2xl cursor-pointer text-white font-bold transition">🏠 Dashboard</div>
+            
+            <div class="group">
+                <div class="p-4 hover:bg-slate-800 rounded-2xl cursor-pointer flex justify-between items-center">🛒 Sales <span class="text-[10px]">▼</span></div>
+                <div class="pl-8 py-2 space-y-2 hidden group-hover:block transition">
+                    <div class="hover:text-white cursor-pointer py-1">Invoices</div>
+                    <div class="hover:text-white cursor-pointer py-1">Customers</div>
+                </div>
             </div>
-            <!-- Dynamic menu based on QB Roles will go here -->
+
+            <div class="group">
+                <div class="p-4 hover:bg-slate-800 rounded-2xl cursor-pointer flex justify-between items-center">💸 Expenses <span class="text-[10px]">▼</span></div>
+                <div class="pl-8 py-2 space-y-2 hidden group-hover:block transition">
+                    <div class="hover:text-white cursor-pointer py-1">Bills</div>
+                    <div class="hover:text-white cursor-pointer py-1">Suppliers</div>
+                </div>
+            </div>
+
+            <div onclick="loadDashboard()" class="p-4 hover:bg-slate-800 rounded-2xl cursor-pointer transition">🏦 Banking</div>
+            <div onclick="loadDashboard()" class="p-4 hover:bg-slate-800 rounded-2xl cursor-pointer transition">📊 Reports</div>
+
+            <!-- ASLAM'S CONTROL CENTER -->
+            <div id="superadmin-tab" class="hidden pt-10 border-t border-slate-800 mt-10">
+                <div class="text-[10px] font-black uppercase text-slate-500 mb-4 px-4 tracking-widest">System Master</div>
+                <div onclick="loadApprovals()" class="p-4 bg-blue-600/20 text-blue-400 rounded-2xl cursor-pointer font-bold hover:bg-blue-600/30">🏢 Entity Approvals</div>
+            </div>
         </nav>
+        <button onclick="handleLogout()" class="p-8 border-t border-slate-800 text-left font-bold hover:text-white transition">↩ Logout</button>
     </aside>
-    <main class="flex-1 p-10 overflow-y-auto" id="main-content"></main>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col bg-white overflow-hidden">
+        <header class="h-20 border-b flex items-center justify-between px-10 shrink-0">
+            <div class="flex items-center gap-4">
+                <span id="active-biz-name" class="font-black text-2xl text-blue-700 italic">NinjaBooks</span>
+            </div>
+            <div id="user-header" class="text-sm font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-full"></div>
+        </header>
+        <div id="app-content" class="flex-1 overflow-y-auto p-12 bg-[#fcfdfe]">
+            <!-- Dynamic Module Content -->
+        </div>
+    </main>
 </div>
 
 <!-- LOGIN MODAL -->
-<div id="login-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[100]">
-    <div class="bg-white p-10 rounded-3xl w-96 shadow-2xl">
-        <h2 class="text-2xl font-bold mb-6">Login</h2>
-        <input type="email" id="li-email" placeholder="Email" class="w-full p-4 border rounded-xl mb-4">
-        <input type="password" id="li-pass" placeholder="Password" class="w-full p-4 border rounded-xl mb-6">
-        <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold">Sign In</button>
+<div id="login-modal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-[200] backdrop-blur-md">
+    <div class="bg-white p-10 rounded-[40px] w-[400px] shadow-2xl border relative">
+        <button onclick="closeLogin()" class="absolute top-6 right-6 text-slate-300 hover:text-slate-900 text-2xl">✕</button>
+        <h2 class="text-3xl font-black mb-8 text-center tracking-tighter uppercase">Sign In</h2>
+        <form onsubmit="handleLogin(event)" class="space-y-4">
+            <input type="email" id="li-email" placeholder="Email Address" class="input-box" required>
+            <input type="password" id="li-pass" placeholder="Password" class="input-box" required>
+            <button type="submit" id="login-btn" class="w-full btn-primary text-lg shadow-xl">Login to NinjaBooks</button>
+        </form>
     </div>
 </div>
 
 <script>
+// --- CREDENTIALS (Updated) ---
 const CONFIG = {
     SB_URL: 'https://ptxegnanbbnflcndqvdp.supabase.co',
     SB_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0eGVnbmFuYmJuZmxjbmRxdmRwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5OTEyMDIsImV4cCI6MjA5MDU2NzIwMn0.8oH1qM4vvQWvji3sR8PkyhLYhjlONuu4zy_i-YLrtmU'
 };
 
 const _sb = supabase.createClient(CONFIG.SB_URL, CONFIG.SB_KEY);
+
 let currentStep = 1;
+let sessionUser = null;
+let sessionProfile = null;
+let activeCompany = null;
 
-// --- STEPPER LOGIC ---
-document.getElementById('next-btn').onclick = () => {
-    if (currentStep < 6) {
-        document.getElementById(`step-${currentStep}-content`).classList.add('hidden');
-        document.getElementById(`step-${currentStep}-pill`).classList.replace('active', 'completed');
+// --- STEPPER ENGINE ---
+const nextBtn = document.getElementById('next-btn');
+const prevBtn = document.getElementById('prev-btn');
+const submitBtn = document.getElementById('submit-btn');
+
+nextBtn.onclick = () => {
+    if(currentStep < 6) {
+        document.getElementById(`step-${currentStep}`).classList.add('hidden');
+        document.getElementById(`step-pill-${currentStep}`).classList.replace('active', 'completed');
         currentStep++;
-        document.getElementById(`step-${currentStep}-content`).classList.remove('hidden');
-        document.getElementById(`step-${currentStep}-pill`).classList.add('active');
-        if(currentStep === 6) generateCOA();
-        toggleButtons();
+        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+        document.getElementById(`step-pill-${currentStep}`).classList.add('active');
+        if(currentStep === 6) buildCOA();
+        toggleSteps();
     }
-};
-
-function toggleButtons() {
-    document.getElementById('prev-btn').classList.toggle('hidden', currentStep === 1);
-    document.getElementById('next-btn').classList.toggle('hidden', currentStep === 6);
-    document.getElementById('submit-btn').classList.toggle('hidden', currentStep !== 6);
+}
+prevBtn.onclick = () => {
+    if(currentStep > 1) {
+        document.getElementById(`step-${currentStep}`).classList.add('hidden');
+        document.getElementById(`step-pill-${currentStep}`).classList.remove('active');
+        currentStep--;
+        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+        document.getElementById(`step-pill-${currentStep}`).classList.replace('completed', 'active');
+        toggleSteps();
+    }
+}
+function toggleSteps() {
+    prevBtn.classList.toggle('hidden', currentStep === 1);
+    nextBtn.classList.toggle('hidden', currentStep === 6);
+    submitBtn.classList.toggle('hidden', currentStep !== 6);
 }
 
-// --- COA GENERATION LOGIC ---
-function generateCOA() {
-    const coaList = [
-        { name: 'Cash', type: 'Asset' },
-        { name: 'Accounts Receivable', type: 'Asset' },
-        { name: 'Accounts Payable', type: 'Liability' },
-        { name: 'Owner Equity', type: 'Equity' }
+// --- AUTOMATIC CHART OF ACCOUNTS GENERATOR ---
+function buildCOA() {
+    const coa = [
+        {n:'Cash at Bank',t:'Asset'}, {n:'Accounts Receivable',t:'Asset'}, 
+        {n:'Accounts Payable',t:'Liability'}, {n:'Opening Balance Equity',t:'Equity'}
     ];
-
     if(document.getElementById('ops-inv').value === 'yes') {
-        coaList.push({ name: 'Inventory', type: 'Asset' }, { name: 'COGS', type: 'Expense' });
+        coa.push({n:'Inventory Asset',t:'Asset'}, {n:'Cost of Goods Sold',t:'Expense'});
     }
     if(document.getElementById('ops-services').value === 'yes') {
-        coaList.push({ name: 'Service Revenue', type: 'Revenue' });
+        coa.push({n:'Service Revenue',t:'Income'});
+    }
+    if(document.getElementById('ops-products').value === 'yes') {
+        coa.push({n:'Sales Income',t:'Income'});
     }
 
     const container = document.getElementById('coa-preview');
-    container.innerHTML = coaList.map(a => `
-        <div class="flex justify-between p-2 bg-white border rounded-lg text-sm">
-            <span class="font-bold">${a.name}</span>
-            <span class="text-slate-400 uppercase text-[10px]">${a.type}</span>
-        </div>
-    `).join('');
+    container.innerHTML = coa.map(a => `
+        <div class="bg-white p-4 border rounded-2xl flex justify-between items-center shadow-sm">
+            <span class="font-bold text-slate-800 text-sm">${a.n}</span>
+            <span class="text-[9px] bg-blue-50 text-blue-600 px-2 py-1 rounded-full uppercase font-black">${a.t}</span>
+        </div>`).join('');
 }
 
-// --- SUPERADMIN APPROVALS ---
-async function loadApprovals() {
-    const { data: comps } = await _sb.from('companies').select('*').eq('status', 'pending');
-    const main = document.getElementById('main-content');
-    main.innerHTML = `
-        <h1 class="text-3xl font-black mb-8">Pending Company Approvals</h1>
-        <div class="grid gap-4">
-            ${comps.map(c => `
-                <div class="bg-white p-6 rounded-2xl border flex justify-between items-center">
-                    <div>
-                        <div class="font-black text-lg">${c.name}</div>
-                        <div class="text-sm text-slate-500">${c.industry} | ${c.email}</div>
-                    </div>
-                    <button onclick="approveCompany('${c.id}')" class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold">Approve Entity</button>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-async function approveCompany(id) {
-    const { error } = await _sb.from('companies').update({ status: 'approved' }).eq('id', id);
-    if(!error) { alert('Company Approved!'); loadApprovals(); }
-}
-
+// --- AUTHENTICATION & CORE ---
 async function checkAuth() {
     const { data: { user } } = await _sb.auth.getUser();
     if(user) {
+        sessionUser = user;
+        document.getElementById('user-header').innerText = user.email;
         const { data: prof } = await _sb.from('profiles').select('*').eq('id', user.id).single();
+        sessionProfile = prof;
+
         if(prof.role === 'superadmin') {
-            document.getElementById('app-layout').classList.add('active');
-            document.getElementById('sa-menu').classList.remove('hidden');
+            document.getElementById('superadmin-tab').classList.remove('hidden');
+            showView('app-layout');
             loadApprovals();
+            return;
+        }
+
+        const { data: company } = await _sb.from('companies').select('*').eq('owner_id', user.id).single();
+        if(!company) {
+            showView('setup-view');
+        } else if(company.status === 'pending') {
+            renderPending(company.name);
         } else {
-            // Check if they have an approved company
-            const { data: comp } = await _sb.from('companies').select('*').eq('owner_id', user.id).single();
-            if(!comp) showView('setup-view');
-            else if(comp.status === 'pending') alert('Your company is awaiting Aslam\'s approval.');
-            else { document.getElementById('app-layout').classList.add('active'); loadDashboard(); }
+            activeCompany = company;
+            showView('app-layout');
+            loadDashboard();
         }
     } else {
-        showView('signup-view');
+        showView('landing-view');
     }
 }
 
-function showView(id) {
-    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+async function handleSignup(e) {
+    e.preventDefault();
+    const btn = document.getElementById('signup-btn');
+    btn.innerText = "Connecting...";
+    const { error } = await _sb.auth.signUp({
+        email: document.getElementById('su-email').value,
+        password: document.getElementById('su-pass').value,
+        options: { data: { full_name: document.getElementById('su-name').value } }
+    });
+    btn.innerText = "Create Account";
+    if(error) return toast("Signup Error: " + error.message, false);
+    toast("Check your email for the verification link!");
 }
 
-window.onload = checkAuth;
-</script>
-</body>
-</html>
+async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    btn.innerText = "Authenticating...";
+    const { error } = await _sb.auth.signInWithPassword({
+        email: document.getElementById('li-email').value,
+        password: document.getElementById('li-pass').value
+    });
+    btn.innerText = "Login to NinjaBooks";
+    if(error) return toast(error.message, false);
+    location.reload();
+}
+
+async function handleCompanySetup(e) {
+    e.preventDefault();
+    const payload = {
+        owner_id: sessionUser.id,
+        name: document.getElementById('c-name').value,
+        industry: document.getElementById('c-industry').value,
+        currency: document.getElementById('c-currency').value,
+        sell_products: document.getElementById('ops-products').value === 'yes',
+        provide_services: document.getElementById('ops-services').value === 'yes',
+        manage_inventory: document.getElementById('ops-inv').value === 'yes',
+        status: 'pending'
+    };
+    const { error } = await _sb.from('companies').insert(payload);
+    if(error) return toast(error.message, false);
+    toast("Company Submitted for Review!");
+    location.reload();
+}
+
+// --- ADMIN / DASHBOARD VIEWS ---
+function showView(id) {
+    document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+    document.ge
